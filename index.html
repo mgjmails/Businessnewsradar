@@ -5,191 +5,159 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Business News Radar</title>
   <style>
-    :root{
-      --bg:#f3f6fb;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--brand:#0b5cff;--chip:#e0e7ff;--ok:#25D366;--shadow:0 10px 30px rgba(15,23,42,.07)
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f3f6fb;color:#0f172a}
     .wrap{max-width:1100px;margin:0 auto;padding:20px}
-    header{display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0 12px}
-    h1{margin:0;font-weight:900;letter-spacing:-.02em;text-align:center;font-size:clamp(38px,5.6vw,64px)}
-    .sub{margin:0;color:var(--muted);font-size:14px;text-align:center}
-
-    .toolbar{display:flex;justify-content:center;gap:10px;margin:10px 0 18px}
-    .btn{appearance:none;border:1px solid #d1d5db;background:#fff;border-radius:999px;padding:9px 14px;font-size:13px;cursor:pointer}
-
-    #banner{display:none;align-items:center;justify-content:center;gap:10px;background:#eef2ff;border:1px solid #c7d2fe;color:#334155;padding:12px 14px;border-radius:12px;box-shadow:var(--shadow);margin:0 auto 14px;max-width:820px}
-    #banner.show{display:flex}
-    .spinner{width:16px;height:16px;border-radius:50%;border:3px solid #93c5fd;border-top-color:#1d4ed8;animation:spin .9s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    #news{display:grid;grid-template-columns:1fr;gap:14px}
-    @media(min-width:700px){#news{grid-template-columns:1fr 1fr}}
-
-    .card{display:flex;gap:14px;align-items:flex-start;background:var(--card);border-radius:14px;padding:16px;box-shadow:var(--shadow);min-height:120px}
-    .thumb{width:96px;height:96px;border-radius:12px;object-fit:cover;background:#e5e7eb;flex:0 0 96px}
-    .title{margin:0 0 6px;font-size:18px;font-weight:800;line-height:1.28}
-    .summary{margin:0 0 10px;color:#374151;font-size:14px}
-    .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#6b7280;font-size:12px}
-    .left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--chip);color:#1e293b;font-weight:900;font-size:12px;border:1px solid #c7d2fe}
-    .actions{display:flex;align-items:center;gap:10px}
-    .link{color:var(--brand);text-decoration:none;font-weight:800}
-    .wa{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--ok);color:#fff;text-decoration:none;font-size:16px}
-
-    /* Skeletons for instant perceived load */
-    .skeleton{position:relative;overflow:hidden}
-    .sk-card{background:var(--card);border-radius:14px;padding:16px;box-shadow:var(--shadow);display:flex;gap:14px}
-    .sk-thumb,.sk-line{background:linear-gradient(90deg,#edf2f7 25%,#f7fafc 37%,#edf2f7 63%);background-size:400% 100%;animation:shimmer 1.2s infinite}
-    .sk-thumb{width:96px;height:96px;border-radius:12px;flex:0 0 96px}
-    .sk-line{height:14px;border-radius:8px}
-    .sk-w1{width:70%}.sk-w2{width:95%}.sk-w3{width:55%}
-    @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
-
-    .last{margin:10px 0 0;text-align:center;color:#64748b;font-size:12px}
+    h1{text-align:center;font-size:48px;margin:10px 0;font-weight:900}
+    .sub{text-align:center;color:#64748b;margin:0 0 20px}
+    #banner{display:none;text-align:center;padding:10px;background:#eef2ff;border:1px solid #c7d2fe;margin:0 auto 15px;max-width:800px;border-radius:10px}
+    #banner.show{display:block}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px}
+    @media(min-width:700px){.grid{grid-template-columns:1fr 1fr}}
+    .card{display:flex;gap:12px;background:#fff;padding:14px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08)}
+    .thumb{width:90px;height:90px;object-fit:cover;border-radius:8px;background:#ddd}
+    .title{margin:0;font-size:17px;font-weight:700}
+    .summary{font-size:14px;color:#374151;margin:4px 0 8px}
+    .meta{font-size:12px;color:#555;display:flex;justify-content:space-between;align-items:center}
+    .badge{background:#e0e7ff;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700}
+    .wa{background:#25D366;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;text-decoration:none}
+    .last{text-align:center;font-size:12px;color:#666;margin-top:12px}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <h1>Business News Radar</h1>
-      <p class="sub">Fresh headlines from India’s top business portals • Auto‑refresh every 60s</p>
-    </header>
+    <h1>Business News Radar</h1>
+    <p class="sub">Latest updates from 30+ business & finance portals worldwide</p>
 
-    <div id="banner"><div class="spinner"></div><div><strong>Please wait.</strong> Our Radar is fetching the latest business news from all sources…</div></div>
-    <div class="toolbar"><button id="refresh" class="btn">Refresh now</button></div>
+    <div id="banner"><strong>Please wait.</strong> Fetching the latest news…</div>
 
-    <div id="news"></div>
+    <h2 style="font-size:18px;margin-top:10px">Today’s Top Stories</h2>
+    <div id="newsToday" class="grid"></div>
+
+    <h2 style="font-size:18px;margin-top:20px">News we shared Yesterday</h2>
+    <div id="newsYesterday" class="grid"></div>
+
     <p id="last" class="last"></p>
   </div>
 
   <script>
-    // 10 Indian portals
+    // Expand with more sources (India + Global)
     const SOURCES = [
-      { name:'Economic Times',    url:'https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms' },
-      { name:'Moneycontrol',      url:'https://www.moneycontrol.com/rss/latestnews.xml' },
-      { name:'LiveMint',          url:'https://www.livemint.com/rss/market/stock-market-news/rssfeed.xml' },
+      { name:'Economic Times', url:'https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms' },
+      { name:'Moneycontrol', url:'https://www.moneycontrol.com/rss/latestnews.xml' },
+      { name:'LiveMint', url:'https://www.livemint.com/rss/market/stock-market-news/rssfeed.xml' },
       { name:'Business Standard', url:'https://www.business-standard.com/rss/home-page-top-stories.rss' },
-      { name:'Business Today',    url:'https://www.businesstoday.in/rssfeeds/?id=211' },
+      { name:'Business Today', url:'https://www.businesstoday.in/rssfeeds/?id=211' },
       { name:'Financial Express', url:'https://www.financialexpress.com/market/feed/' },
-      { name:'Forbes India',      url:'https://www.forbesindia.com/rssfeed/rss.xml' },
-      { name:'VCCircle',          url:'https://www.vccircle.com/rss/feed' },
-      { name:'Pulse by Zerodha',  url:'https://pulse.zerodha.com/feed/' },
-      { name:'TradingView India', url:'https://in.tradingview.com/news/rss/' }
+      { name:'Forbes India', url:'https://www.forbesindia.com/rssfeed/rss.xml' },
+      { name:'VCCircle', url:'https://www.vccircle.com/rss/feed' },
+      { name:'Pulse by Zerodha', url:'https://pulse.zerodha.com/feed/' },
+      { name:'TradingView India', url:'https://in.tradingview.com/news/rss/' },
+      { name:'Bloomberg', url:'https://www.bloomberg.com/feed/podcast/etf-report.xml' },
+      { name:'Reuters Business', url:'https://feeds.reuters.com/reuters/businessNews' },
+      { name:'Financial Times', url:'https://www.ft.com/?format=rss' },
+      { name:'CNBC', url:'https://www.cnbc.com/id/100003114/device/rss/rss.html' },
+      { name:'MarketWatch', url:'https://www.marketwatch.com/rss/topstories' },
+      { name:'Wall Street Journal', url:'https://feeds.a.dj.com/rss/RSSMarketsMain.xml' },
+      { name:'Yahoo Finance', url:'https://feeds.finance.yahoo.com/rss/2.0/headline?s=&region=US&lang=en-US' },
+      { name:'Investing.com', url:'https://www.investing.com/rss/news.rss' },
+      { name:'Seeking Alpha', url:'https://seekingalpha.com/market_currents.xml' },
+      { name:'Business Insider', url:'https://www.businessinsider.com/rss' },
+      { name:'The Hindu BusinessLine', url:'https://www.thehindubusinessline.com/feeder/default.rss' },
+      { name:'NDTV Profit', url:'https://feeds.feedburner.com/ndtvprofit-latest' },
+      { name:'Global Times Business', url:'https://www.globaltimes.cn/rss/business.xml' },
+      { name:'The Guardian Business', url:'https://www.theguardian.com/uk/business/rss' },
+      { name:'New York Times Business', url:'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml' },
+      { name:'BBC Business', url:'http://feeds.bbci.co.uk/news/business/rss.xml' },
+      { name:'Fortune', url:'https://fortune.com/feed/' },
+      { name:'Nikkei Asia', url:'https://asia.nikkei.com/rss' },
+      { name:'The Economist', url:'https://www.economist.com/business/rss.xml' },
+      { name:'Morningstar', url:'https://www.morningstar.com/rss' }
     ];
 
-    // Render skeletons immediately
-    const newsEl = document.getElementById('news');
-    function renderSkeletons(n=10){
-      newsEl.innerHTML = Array.from({length:n}).map(()=>`
-        <div class="sk-card skeleton">
-          <div class="sk-thumb"></div>
-          <div style="flex:1;display:flex;flex-direction:column;gap:8px">
-            <div class="sk-line sk-w2"></div>
-            <div class="sk-line sk-w1"></div>
-            <div class="sk-line sk-w3"></div>
-          </div>
-        </div>`).join('');
-    }
+    const todayEl = document.getElementById('newsToday');
+    const yesterdayEl = document.getElementById('newsYesterday');
 
-    // Faster CORS: fire all proxies concurrently and use the first that works
-    const viaAllOrigins = (u)=>`https://api.allorigins.win/get?url=${encodeURIComponent(u)}`;
-    const viaJina = (u)=>`https://r.jina.ai/http://` + u.replace(/^https?:\/\//,'');
-    const viaIso  = (u)=>`https://cors.isomorphic-git.org/` + u;
-
-    async function fetchFirst(url){
-      const p1 = fetch(viaAllOrigins(url)).then(r=>r.ok?r.json():Promise.reject()).then(j=>j && j.contents);
-      const p2 = fetch(viaJina(url)).then(r=>r.ok?r.text():Promise.reject());
-      const p3 = fetch(viaIso(url)).then(r=>r.ok?r.text():Promise.reject());
-      try{
-        // Promise.any polyfill behavior
-        return await Promise.any([p1,p2,p3]);
-      }catch{ // as a last resort try direct
-        try{const r=await fetch(url); if(r.ok) return await r.text();}catch{}
-        return null;
-      }
-    }
-
+    function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
     function textOnly(html){return (html||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();}
-    function firstTagAttr(node, tag, attr){ const el = node.getElementsByTagName(tag)[0]; return el ? (el.getAttribute(attr)||'') : ''; }
+    function firstTagAttr(node, tag, attr){const el=node.getElementsByTagName(tag)[0];return el?(el.getAttribute(attr)||''):'';}
 
     function parseFeed(xmlText, source){
       if(!xmlText) return [];
-      const p = new DOMParser();
-      const doc = p.parseFromString(xmlText,'text/xml');
-      let nodes = Array.from(doc.getElementsByTagName('item'));
-      if(!nodes.length) nodes = Array.from(doc.getElementsByTagName('entry'));
-      return nodes.slice(0,15).map(n=>{
-        const t = n.getElementsByTagName('title')[0]?.textContent?.trim() || 'Untitled';
-        let link = n.getElementsByTagName('link')[0]?.textContent?.trim() || '#';
-        const linkHref = n.getElementsByTagName('link')[0]?.getAttribute('href');
-        if((!link || link === '#') && linkHref) link = linkHref;
-        const raw = n.getElementsByTagName('content:encoded')[0]?.textContent || n.getElementsByTagName('description')[0]?.textContent || n.getElementsByTagName('summary')[0]?.textContent || '';
-        const desc = textOnly(raw);
-        const pub = n.getElementsByTagName('pubDate')[0]?.textContent || n.getElementsByTagName('updated')[0]?.textContent || n.getElementsByTagName('published')[0]?.textContent || '';
-        const ts = pub ? Date.parse(pub) : Date.now();
-        const img = firstTagAttr(n,'media:content','url') || firstTagAttr(n,'media:thumbnail','url') || firstTagAttr(n,'enclosure','url') || '';
-        return {title:t, link, desc, ts, source, img};
+      const p=new DOMParser();
+      const doc=p.parseFromString(xmlText,'text/xml');
+      let nodes=Array.from(doc.getElementsByTagName('item'));
+      if(!nodes.length) nodes=Array.from(doc.getElementsByTagName('entry'));
+      return nodes.slice(0,40).map(n=>{
+        const t=n.getElementsByTagName('title')[0]?.textContent?.trim()||'Untitled';
+        let link=n.getElementsByTagName('link')[0]?.textContent?.trim()||'#';
+        const linkHref=n.getElementsByTagName('link')[0]?.getAttribute('href');
+        if((!link||link==="#")&&linkHref) link=linkHref;
+        const raw=n.getElementsByTagName('description')[0]?.textContent||'';
+        const desc=textOnly(raw);
+        const pub=n.getElementsByTagName('pubDate')[0]?.textContent||'';
+        const ts=pub?Date.parse(pub):Date.now();
+        const img=firstTagAttr(n,'media:content','url')||firstTagAttr(n,'media:thumbnail','url')||firstTagAttr(n,'enclosure','url')||'';
+        return {title:t,link,desc,ts,source,img};
       });
     }
 
-    function categorize(title, desc){
-      const s = (title + ' ' + desc).toLowerCase();
+    function categorize(title,desc){
+      const s=(title+" "+desc).toLowerCase();
       if(/ipo|nse|bse|share|stock|sensex|nifty|results|q[1-4]/.test(s)) return 'Stocks';
       if(/funding|acquisition|merger|deal|private equity|vc/.test(s)) return 'Industry';
       if(/budget|rbi|inflation|gdp|economy|policy/.test(s)) return 'Economy';
-      if(/ai|artificial intelligence|tech|software|it|semiconductor/.test(s)) return 'AI/Tech';
+      if(/ai|tech|software|it|semiconductor/.test(s)) return 'AI/Tech';
       return 'Business';
     }
 
-    function esc(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
-    function fmtDate(ts){ try{ return new Date(ts).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});}catch{return '';} }
-    function siteIcon(u){ try{ const host=new URL(u).hostname; return `https://www.google.com/s2/favicons?domain=${host}&sz=128`; }catch{return 'https://via.placeholder.com/96x96?text=\uD83D\uDCF0';} }
+    function fmtDate(ts){try{return new Date(ts).toLocaleString();}catch{return'';}}
+    function siteIcon(u){try{const host=new URL(u).hostname;return`https://www.google.com/s2/favicons?domain=${host}&sz=128`;}catch{return'https://via.placeholder.com/90x90?text=News';}}
 
     function cardHTML(n){
-      const cat = categorize(n.title, n.desc);
-      const img = (n.img && n.img.startsWith('http')) ? n.img : siteIcon(n.link);
-      const wa  = `https://api.whatsapp.com/send?text=${encodeURIComponent(n.title + ' ' + n.link)}`;
-      return `<article class="card">
-        <img class="thumb" src="${img}" alt="" loading="lazy" onerror="this.src='${siteIcon(n.link)}'">
-        <div style="flex:1">
-          <h2 class="title">${esc(n.title)}</h2>
-          <p class="summary">${esc(n.desc).slice(0,180)}…</p>
-          <div class="meta">
-            <div class="left"><span class="badge">${cat}</span><span>${esc(n.source)} • ${fmtDate(n.ts)}</span></div>
-            <div class="actions">
-              <a class="link" href="${n.link}" target="_blank" rel="noopener">Read More →</a>
-              <a class="wa" href="${wa}" target="_blank" aria-label="Share on WhatsApp">↗</a>
-            </div>
+      const cat=categorize(n.title,n.desc);
+      const img=(n.img&&n.img.startsWith('http'))?n.img:siteIcon(n.link);
+      const wa=`https://api.whatsapp.com/send?text=${encodeURIComponent(n.title+' '+n.link)}`;
+      return `<div class='card'>
+        <img class='thumb' src='${img}' onerror="this.src='${siteIcon(n.link)}'"/>
+        <div style='flex:1'>
+          <p class='title'>${esc(n.title)}</p>
+          <p class='summary'>${esc(n.desc).slice(0,180)}…</p>
+          <div class='meta'>
+            <span><span class='badge'>${cat}</span> ${esc(n.source)} • ${fmtDate(n.ts)}</span>
+            <a class='wa' href='${wa}' target='_blank'>↗</a>
           </div>
         </div>
-      </article>`;
+      </div>`;
     }
+
+    function startOfToday(){const d=new Date();d.setHours(0,0,0,0);return d.getTime();}
+    function startOfYesterday(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-1);return d.getTime();}
 
     async function load(){
       document.getElementById('banner').classList.add('show');
-      renderSkeletons(12);
+      todayEl.innerHTML=yesterdayEl.innerHTML='';
 
-      // Start all requests at once
-      const pending = SOURCES.map(s=>fetchFirst(s.url).then(txt=>({txt, s})).catch(()=>({txt:null, s})));
-      const results = await Promise.allSettled(pending);
+      const results=await Promise.allSettled(SOURCES.map(s=>fetch(s.url).then(r=>r.text()).then(txt=>({txt,s})).catch(()=>({txt:null,s}))));
+      let items=[];
+      for(const r of results){if(r.value&&r.value.txt){items.push(...parseFeed(r.value.txt,r.value.s.name));}}
 
-      let items = [];
-      for(const r of results){ if(r.value && r.value.txt){ items.push(...parseFeed(r.value.txt, r.value.s.name)); } }
+      const t0=startOfToday();
+      const y0=startOfYesterday();
+      const todayItems=items.filter(it=>it.ts>=t0);
+      const yesterdayItems=items.filter(it=>it.ts>=y0&&it.ts<t0);
 
-      // Sort newest first and cap to ~30 for speed
-      items.sort((a,b)=> (b.ts||0) - (a.ts||0));
-      items = items.slice(0,30);
+      todayItems.sort((a,b)=>b.ts-a.ts);
+      yesterdayItems.sort((a,b)=>b.ts-a.ts);
 
-      newsEl.innerHTML = items.length ? items.map(cardHTML).join('') : '<p class="sub" style="text-align:center">No news right now.</p>';
-      document.getElementById('last').textContent = 'Last updated: ' + new Date().toLocaleString();
+      todayEl.innerHTML=todayItems.map(cardHTML).join('')||'<p class="sub">No news today.</p>';
+      yesterdayEl.innerHTML=yesterdayItems.map(cardHTML).join('')||'<p class="sub">No news yesterday.</p>';
+
+      document.getElementById('last').textContent='Last updated: '+new Date().toLocaleString();
       document.getElementById('banner').classList.remove('show');
     }
 
-    document.getElementById('refresh').addEventListener('click', load);
     load();
-    setInterval(load, 60*1000);
+    setInterval(load,120000);
   </script>
 </body>
 </html>
