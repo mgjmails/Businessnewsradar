@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Business News Aggregator</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        .news-section { margin-bottom: 30px; }
+        .news-section h2 { border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-bottom: 15px; color: #34495e; }
+        ul { list-style: none; padding: 0; }
+        li { background: #ecf0f1; margin-bottom: 10px; padding: 15px; border-radius: 8px; transition: transform 0.2s; }
+        li:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        a { text-decoration: none; color: #2980b9; font-weight: bold; }
+        .summary { font-size: 0.9em; color: #555; margin-top: 5px; }
+        .last-updated { text-align: center; font-size: 0.8em; color: #888; margin-top: 20px; }
+        .error { color: #c0392b; font-size: 0.95em; margin-bottom: 10px; text-align: center;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Latest Indian Business & Market News</h1>
+        <div id="news-content">
+            <p style="text-align: center;">Loading latest news... This may take a moment.</p>
+        </div>
+        <div class="last-updated" id="last-updated"></div>
+    </div>
+
+    <script>
+        // Change this to your own proxy if needed
+        const PROXY_URL = 'https://cors-anywhere.herokuapp.com/'; // Or '' to fetch directly (may fail due to CORS)
+
+        const newsSources = [
+            { name: 'The Economic Times – Markets', url: 'https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms' },
+            { name: 'Moneycontrol', url: 'https://www.moneycontrol.com/rss/latest_financial_news.xml' },
+            { name: 'LiveMint (Stock Market News)', url: 'https://www.livemint.com/rss/market/stock-market-news/rssfeed.xml' },
+            { name: 'Business Standard', url: 'https://www.business-standard.com/rss/home-page-top-stories.rss' },
+            { name: 'Business Today', url: 'https://www.businesstoday.in/rss.xml' },
+            { name: 'Financial Express (Markets)', url: 'https://financialexpress.com/market/feed/' },
+            { name: 'Forbes India', url: 'https://www.forbesindia.com/feed/blogs/' },
+            { name: 'VCCircle', url: 'https://www.vccircle.com/rss/feed' },
+            { name: 'Pulse by Zerodha', url: 'https://pulse.zerodha.com/feed/' },
+            { name: 'TradingView (India News)', url: 'https://in.tradingview.com/news/rss/' }
+        ];
+
+        // Simple sanitization to avoid XSS from RSS feeds
+        function sanitizeHTML(str) {
+            const temp = document.createElement('div');
+            temp.textContent = str;
+            return temp.innerHTML;
+        }
+
+        async function fetchRSSFeed(source) {
+            try {
+                const response = await fetch(PROXY_URL + source.url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                const items = xmlDoc.querySelectorAll('item');
+                let newsItems = [];
+                items.forEach(item => {
+                    const title = item.querySelector('title')?.textContent || 'No Title';
+                    const link = item.querySelector('link')?.textContent || '#';
+                    let description = item.querySelector('description')?.textContent || 'No description available.';
+                    // Remove HTML tags from description for clean summary
+                    description = sanitizeHTML(description.replace(/<[^>]+>/g, ''));
+                    const pubDateRaw = item.querySelector('pubDate')?.textContent;
+                    // Some feeds may have missing or invalid pubDate
+                    let pubDate = pubDateRaw ? new Date(pubDateRaw) : new Date();
+                    if (isNaN(pubDate.getTime())) pubDate = new Date();
+                    newsItems.push({
+                        title,
+                        link,
+                        description,
+                        pubDate,
+                        source: source.name
+                    });
+                });
+                return { source: source.name, news: newsItems, error: null };
+            } catch (error) {
+                return { source: source.name, news: [], error: error.message || error };
+            }
+        }
+
+        async function fetchNews() {
+            const newsContentDiv = document.getElementById('news-content');
+            newsContentDiv.innerHTML = '<p style="text-align: center;">Fetching latest news...</p>';
+
+            // Parallel fetch all feeds
+            const fetchPromises = newsSources.map(src => fetchRSSFeed(src));
+            const results = await Promise.all(fetchPromises);
+
+            let allNews = [];
+            let errors = [];
+
+            results.forEach(result => {
+                if (result.error) {
+                    errors.push(`Failed to fetch news from <b>${sanitizeHTML(result.source)}</b>: ${sanitizeHTML(result.error)}`);
+                } else {
+                    allNews.push(...result.news);
+                }
+            });
+
+            // Sort by date, newest first
+            allNews.sort((a, b) => b.pubDate - a.pubDate);
+
+            newsContentDiv.innerHTML = '';
+
+            // Show errors, if any
+            if (errors.length > 0) {
+                errors.forEach(err => {
+                    const errDiv = document.createElement('div');
+                    errDiv.className = 'error';
+                    errDiv.innerHTML = err;
+                    newsContentDiv.appendChild(errDiv);
+                });
+            }
+
+            if (allNews.length === 0) {
+                newsContentDiv.innerHTML += '<p style="text-align: center;">No news could be loaded. Please try again later.</p>';
+                return;
+            }
+
+            // Render latest 5 stories per source
+            newsSources.forEach(source => {
+                const sourceNews = allNews.filter(item => item.source === source.name);
+                if (sourceNews.length > 0) {
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'news-section';
+                    sectionDiv.innerHTML = `<h2>${sanitizeHTML(source.name)}</h2><ul></ul>`;
+
+                    const ul = sectionDiv.querySelector('ul');
+                    sourceNews.slice(0, 5).forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <a href="${sanitizeHTML(item.link)}" target="_blank" rel="noopener">${sanitizeHTML(item.title)}</a>
+                            <p class="summary">${sanitizeHTML(item.description.substring(0, 150))}...</p>
+                        `;
+                        ul.appendChild(li);
+                    });
+                    newsContentDiv.appendChild(sectionDiv);
+                }
+            });
+
+            // Last updated time
+            const now = new Date();
+            document.getElementById('last-updated').textContent = `Last updated: ${now.toLocaleString()}`;
+        }
+
+        // Initial load
+        fetchNews();
+
+        // Refresh every minute
+        setInterval(fetchNews, 60000);
+    </script>
+</body>
+</html>
